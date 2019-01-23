@@ -41,7 +41,7 @@ function generateToken(user) {
     const secret = process.env.JWT_SECRET;
 
     const options = {
-        expiresIn: '5m'
+        expiresIn: '30m'
     };
 
     return jwt.sign(payload, secret, options);
@@ -81,9 +81,18 @@ function protected(req, res, next) {
     };
 };
 
+// function checkDepartment(dept) {
+//     return function(req, res, next) {
+//         if ()
+//     }
+// };
+
 server.get('/api/users', protected, (req, res) => {
+    const department = req.decodedToken.department;
+
     db('users')
-        .select('id', 'username', 'department')
+        .where('department', department)
+        .select('id', 'username', 'department', 'password')
         .then(users => {
             res.json({ users, decodedToken: req.decodedToken });
         })
