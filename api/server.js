@@ -17,10 +17,6 @@ server.use(express.json());
 
 
 // routes
-server.get('/', (req, res) => {
-    res.send('testing');
-});
-
 server.post('/api/register', (req, res) => {
     const userInfo = req.body;
     const hash = bcrypt.hashSync(userInfo.password, 12);
@@ -36,6 +32,21 @@ server.post('/api/register', (req, res) => {
         });
 });
 
+function generateToken(user) {
+    const payload = {
+        username: user.username,
+        department: user.department
+    };
+
+    const secret = process.env.JWT_SECRET;
+
+    const options = {
+        expiresIn: '5m'
+    };
+
+    return jwt.sign(payload, secret, options);
+};
+
 server.post('/api/login', (req, res) => {
     const creds = req.body;
 
@@ -44,7 +55,8 @@ server.post('/api/login', (req, res) => {
         .first()
         .then(user => {
             if (user && bcrypt.compareSync(creds.password, user.password)) {
-                res.status(200).json({ message: `Welcome ${user.username}` });
+                const token = generateToken(user);
+                res.status(200).json({ message: `Welcome ${user.username}`, token });
             } else {
                 res.status(401).json({ message: 'You are not authorized. Please try logging again.' });
             };
@@ -52,11 +64,28 @@ server.post('/api/login', (req, res) => {
         .catch(err => res.status(500).json(err));
 });
 
-server.get('/api/users', (req, res) => {
+function protected(req, res, next) {
+    const token = req.headers.authorization;
+
+    if (token) {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
+            if (err) {
+                res.status(401).json({ message: 'Invalid token' });
+            } else {
+                req.decodedToken = decodedToken;
+                next();
+            }
+        });
+    } else {
+        res.status(401).json({ message: 'no token provided' });
+    };
+};
+
+server.get('/api/users', protected, (req, res) => {
     db('users')
         .select('id', 'username', 'department')
         .then(users => {
-            res.json(users);
+            res.json({ users, decodedToken: req.decodedToken });
         })
         .catch(err => res.send(err));
 });
