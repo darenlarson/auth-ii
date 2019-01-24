@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, NavLink } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import './App.css';
 
 import Navigation from './components/Navigation.js';
@@ -13,11 +13,6 @@ class App extends Component {
   render() {
     return (
       <div>
-        {/* <nav>
-          <NavLink to="/signin">Log in</NavLink>
-          <NavLink to="signup">Register</NavLink>
-          <button onClick={this.signout}>Log out</button>
-        </nav> */}
         <Route path="/" component={Navigation} />
         <Route exact path="/" component={Homepage} />
         <Route path="/signin" component={Signin} />

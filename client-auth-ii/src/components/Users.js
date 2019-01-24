@@ -3,7 +3,8 @@ import axios from 'axios';
 
 class Users extends React.Component {
     state = {
-        users: []
+        users: [],
+        loggedIn: false
     }
 
     async componentDidMount() {
@@ -19,23 +20,30 @@ class Users extends React.Component {
             const response = await axios.get(endpoint, requestOptions);
             console.log(response);
 
-			this.setState({ users: response.data.users });
+			this.setState({ users: response.data.users, loggedIn: true });
         } catch (error) {
             console.log('we ran into an issue getting the users');
         };
     }
 
     render() {
-        return (
-            <div>
-                <h2>List of Users</h2>
-                <ul>
-                    {this.state.users.map(user => (
-                        <li key={user.id}>{user.username}, {user.department}</li>
-                    ))}
-                </ul>
-            </div>
-        );
+
+        if (this.state.loggedIn === true) {
+            return (
+                <div>
+                    <h2>List of Users</h2>
+                    <ul>
+                        {this.state.users.map(user => (
+                            <li key={user.id}>{user.username}, {user.department}</li>
+                        ))}
+                    </ul>
+                </div>
+            );
+        } else {
+            return (
+                <p>Please log in to view the users</p>
+            )
+        }
     };
 };
 
