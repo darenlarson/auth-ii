@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
 const knex = require('knex');
+const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -12,6 +13,7 @@ const server = express();
 
 const db = knex(knexConfig.development);
 
+server.use(cors());
 server.use(helmet());
 server.use(express.json());
 
@@ -64,8 +66,9 @@ server.post('/api/login', (req, res) => {
         .catch(err => res.status(500).json(err));
 });
 
+// Middleware function used in the /api/users route that verifies that a valid token was sent in the header before sending the users from the database.
 function protected(req, res, next) {
-    const token = req.headers.authorization;
+    const token = req.headers.authorization; //grabs the token from the request header. This token was originally sent to the client from the .post /api/login
 
     if (token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decodedToken) => {
@@ -80,12 +83,6 @@ function protected(req, res, next) {
         res.status(401).json({ message: 'no token provided' });
     };
 };
-
-// function checkDepartment(dept) {
-//     return function(req, res, next) {
-//         if ()
-//     }
-// };
 
 server.get('/api/users', protected, (req, res) => {
     const department = req.decodedToken.department;
