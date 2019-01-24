@@ -15,13 +15,16 @@ class Signup extends React.Component {
     handleSubmit = event => {
         event.preventDefault();
         const endpoint = `${process.env.REACT_APP_API_URL}/api/register`;
+        const loginEndpoint = `${process.env.REACT_APP_API_URL}/api/login`;
+
         axios
             .post(endpoint, this.state)
             .then(res => {
                 axios
-                    .post(endpoint, { username: this.state.username, password: this.state.password })
+                    .post(loginEndpoint, { username: this.state.username, password: this.state.password })
                     .then(res => {
                         localStorage.setItem('jwt', res.data.token);
+                        this.props.history.push('/users');
                     })
                     .catch(err => console.log(err));
             })
@@ -30,12 +33,15 @@ class Signup extends React.Component {
     
     render() {
         return (
-            <form onSubmit={this.handleSubmit} >
-                <input name="username" value={this.state.username} type="text" onChange={this.handleInputChange} />
-                <input name="password" value={this.state.password} type="password" onChange={this.handleInputChange} />
-                <input name="department" value={this.state.department} type="text" onChange={this.handleInputChange} />
-                <button type="submit">Sign Up!</button>
-            </form>
+            <div>
+                <h2>Create a username and password</h2>
+                <form onSubmit={this.handleSubmit} >
+                    <input placeholder="username" name="username" value={this.state.username} type="text" onChange={this.handleInputChange} />
+                    <input placeholder="password" name="password" value={this.state.password} type="password" onChange={this.handleInputChange} />
+                    <input placeholder="department" name="department" value={this.state.department} type="text" onChange={this.handleInputChange} />
+                    <button type="submit">Sign Up!</button>
+                </form>
+            </div>
         );
     };
 };

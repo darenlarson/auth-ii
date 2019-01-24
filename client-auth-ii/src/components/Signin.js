@@ -22,17 +22,21 @@ class Signin extends React.Component {
             .then(res => {
                 console.log(res);
                 localStorage.setItem('jwt', res.data.token);
+                this.props.history.push('/users');
             })
             .catch(err => console.log(err));
     };
     
     render() {
         return (
-            <form onSubmit={this.handleSubmit} >
-                <input name="username" value={this.state.username} type="text" onChange={this.handleInputChange} />
-                <input name="password" value={this.state.password} type="password" onChange={this.handleInputChange} />
-                <button type="submit">Login</button>
-            </form>
+            <>
+                <h2>Please enter your username and password</h2>
+                <form onSubmit={this.handleSubmit} >
+                    <input placeholder="username" name="username" value={this.state.username} type="text" onChange={this.handleInputChange} />
+                    <input placeholder="password" name="password" value={this.state.password} type="password" onChange={this.handleInputChange} />
+                    <button type="submit">Login</button>
+                </form>
+            </>
         );
     };
 };
